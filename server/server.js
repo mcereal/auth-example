@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cookieSession = require("cookie-session");
+const expressSession = require("express-session");
 const cors = require("cors");
 const routes = require("./routes");
 const passport = require("./config/passport");
@@ -18,6 +19,18 @@ app.use(
     keys: ["key1", "key2"],
   })
 );
+
+const session = {
+  secret: process.env.SESSION_SECRET,
+  cookie: {},
+  resave: false,
+  saveUninitialized: false,
+};
+
+if (process.env.NODE_ENV === "production") {
+  // Serve secure cookies, requires HTTPS
+  session.cookie.secure = true;
+}
 app.use(passport.initialize());
 app.use(passport.session());
 
