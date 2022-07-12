@@ -4,7 +4,8 @@ const cookieSession = require("cookie-session");
 const expressSession = require("express-session");
 const cors = require("cors");
 const routes = require("./routes");
-const passport = require("./config/passport");
+const strategy = require("./config/passport");
+const passport = require("passport");
 const AUTH_CLIENT_PORT = process.env.AUTH_CLIENT_PORT || 3001;
 const app = express();
 
@@ -31,8 +32,20 @@ if (process.env.NODE_ENV === "production") {
   // Serve secure cookies, requires HTTPS
   session.cookie.secure = true;
 }
+
+app.use(expressSession(session));
+
+passport.use(strategy);
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
 
 app.use(routes);
 
